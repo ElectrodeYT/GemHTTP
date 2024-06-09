@@ -1,14 +1,10 @@
 import argparse
 import asyncio
-import urllib.parse
-import pathlib
-import magic
-
-from pprint import pprint
 
 import gemini
 import http
 import configuration
+import helpers
 
 
 async def run_servers(args):
@@ -18,6 +14,15 @@ async def run_servers(args):
 
     gemini_server_coro = await asyncio.start_server(gemini.gemini_tls_handler, args.host, args.port)
     http_server_coro = await asyncio.start_server(http.http_handler, args.host, args.http_port)
+
+    # If we should drop permissions, do it now
+    if args.drop_to_user is not None:
+        if args.drop_to_group is not None:
+            group = args.drop_to_group
+        else:
+            group = args.drop_to_user
+
+        helpers.drop_privileges(args.drop_to_user, group)
 
     async with gemini_server_coro:
         await asyncio.gather(
@@ -49,12 +54,21 @@ def main():
     parser.add_argument('--certificate', type=str, default='certificate.pem', help='Certificate file')
     parser.add_argument('--private-key', type=str, default='privatekey.pem', help='Private key file')
 
-    parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
-    parser.add_argument('--log-requests', action='store_true', help='Log requests')
+    logging_group = parser.add_mutually_exclusive_group()
+
+    logging_group.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
+    logging_group.add_argument('--log-requests', action='store_true', help='Log requests')
 
     parser.add_argument('--parse-images', action='store_true', help='HTTP: convert in-line links to images into image tags')
 
+    drop_permissions_group = parser.add_argument_group('Drop permissions')
+    drop_permissions_group.add_argument('--drop-to-user', type=str, help='Drop to user.')
+    drop_permissions_group.add_argument('--drop-to-group', type=str, help='Drop to group. Must be given with --drop-to-user.')
+
     args = parser.parse_args()
+
+    if args.drop_to_group is not None and args.drop_to_user is None:
+        parser.error('--drop-to-group requires --drop-to-user')
 
     configuration.init_server_config(args)
 
