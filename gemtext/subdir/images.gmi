@@ -1,0 +1,3 @@
+# Images test
+
+=> flower.jpg

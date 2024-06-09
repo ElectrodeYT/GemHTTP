@@ -1,0 +1,11 @@
+# Hello, World!
+
+This is the test file for the GemHTTPSDualServer Gemini/HTTPS/HTTP server. It is designed to show off all of the features of the server.
+
+=> subdir/index.gmi Test Index
+
+
+```
+This     is    preformatted
+text
+```
