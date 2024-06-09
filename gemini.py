@@ -75,7 +75,7 @@ async def gemini_tls_handler(reader: asyncio.StreamReader, writer: asyncio.Strea
 
     with open(str(file_path), 'rb') as f:
         while True:
-            chunk = f.read(1 * 1024)  # Read the file in 1MB increments
+            chunk = f.read(1 * 1024 * 1024)  # Read the file in 1MB increments
             if not chunk:
                 break
             writer.write(chunk)
