@@ -51,9 +51,9 @@ def gemtext_to_html(gemtext: str, filename: str) -> str:
 
                 link_url = split_line[1]
                 if configuration.all_args.parse_images and link_url.endswith(recognized_image_formats):
-                    output += f'<img src=\"{link_url}\" alt=\"{link_text}\"/>'
+                    output += f'<img src=\"{link_url}\" alt=\"{link_text}\"/><br>'
                 else:
-                    output += f'<a href=\"{link_url}\">{link_text}</a>'
+                    output += f'<a href=\"{link_url}\">{link_text}</a><br>'
             # Empty lines
             elif not len(line):
                 pass
